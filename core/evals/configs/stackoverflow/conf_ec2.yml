@@ -1,0 +1,65 @@
+# Configuration file of Oort training experiment
+
+# ========== Cluster configuration ========== 
+# ip address of the parameter server (need 1 GPU)
+#ps_ip: 10.0.0.5
+#ps_ip: 172.31.4.81
+ps_ip: 172.31.15.220
+
+# ip address of each worker:# of gpus on this worker
+# Note that if we collocate ps and worker, then we need to decrease this number of gpus by 1
+# E.g., master node has 4 GPUs, then 1 for the ps, and worker should be set to: worker:3
+worker_ips:
+#    - 10.0.0.3:1 # worker_ip: # of gpus
+#    - 10.0.0.4:1
+#    - 10.0.0.2:1
+#    - 10.0.0.1:1
+#    - 172.31.4.81:1
+#    - 172.31.3.65:1
+#    - 172.31.5.156:1
+#    - 172.31.13.220:1
+#    - 172.31.12.131:1
+#    - 172.31.3.226:1
+#    - 172.31.4.15:1
+#    - 172.31.7.188:1
+     - 172.31.15.220:[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+
+exp_path: $HOME/SOort/training
+
+auth:
+    ssh_user: ""
+    ssh_private_key: ~/.ssh/id_rsa
+
+# cmd to run before we can indeed run oort (in order)
+setup_commands:
+    - source $HOME/anaconda3/bin/activate oort
+    - export NCCL_SOCKET_IFNAME='ens3'         # Run "ifconfig" to ensure the right NIC for nccl if you have multiple NICs
+
+# ========== Additional job configuration ========== 
+# Default parameters are specified in argParser.py, wherein more description of the parameter can be found
+
+job_conf: 
+    - log_path: $HOME/SOort/training/evals # Path of log files
+    - job_name: stackoverflow               # Generate logs under this folder: log_path/job_name/time_stamp
+    - total_worker: 100                     # Number of participants per round, we use K=100 in our paper, large K will be much slower
+    - data_set: blog                     # Dataset: openImg, google_speech, blog(stackoverflow)
+    - data_dir: $HOME/Oort/FLPerf/dataset/stackoverflow    # Path of the dataset
+    - client_path: $HOME/Oort/FLPerf/dataset/data/device_info/client_profile.pkl     # Path of the client trace
+    - user_trace: $HOME/Oort/FLPerf/dataset/data/device_info/client_behave_trace
+    - data_mapfile: .              # No need to specify for this dataset. Allocation of data to each client, turn to iid setting if not provided
+    - sample_mode: oort                                  # Client selection: random, oort
+    - model: albert-base-v2                            # Models: shufflenet_v2_x2_0, mobilenet_v2, resnet34, albert-base-v2
+    - round_penalty: 2.0                    # Penalty factor in our paper (\alpha), \alpha -> 0 turns to (Oort w/o sys)
+    - eval_interval: 20                     # How many rounds to run a testing on the testing set
+    - epochs: 500                           # Number of rounds to run this training. We use 1000 in our paper, while it may converge w/ ~400 rounds
+    - task: nlp
+    - test_bsz: 32
+    - test_ratio: 0.25
+    - learning_rate: 4e-5
+    - min_learning_rate: 2e-5
+    - pacer_delta: 0.3
+    - exploration_min: 0.4
+    - output_dir: output
+    - skip_partition: True
+    - deadline_percent: 0.8
+    - stale_update: 2

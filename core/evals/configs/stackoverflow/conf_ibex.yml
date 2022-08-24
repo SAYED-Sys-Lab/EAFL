@@ -1,0 +1,62 @@
+# Configuration file of Oort training experiment
+exp_path: $HOME/fl/iFedScale/core
+
+# Entry function of executor and aggregator under $exp_path
+executor_entry: executor.py
+
+aggregator_entry: aggregator.py
+
+auth:
+    ssh_user: ""
+    ssh_private_key: ~/.ssh/id_rsa
+
+# cmd to run before we can indeed run oort (in order)
+setup_commands:
+    - source /sw/csi/anaconda3/4.4.0/binary/anaconda3/etc/profile.d/conda.sh
+    - conda activate $HOME/fl/iFedScale/env
+    - export NCCL_SOCKET_IFNAME='ib0'         # Run "ifconfig" to ensure the right NIC for nccl if you have multiple NICs
+
+# ========== Additional job configuration ========== 
+# Default parameters are specified in argParser.py, wherein more description of the parameter can be found
+
+job_conf: 
+    - log_path: $HOME/fl/iFedScale/core/evals # Path of log files
+    - job_name: stackoverflow               # Generate logs under this folder: log_path/job_name/time_stamp
+    - total_worker: 10                     # Number of participants per round, we use K=100 in our paper, large K will be much slower
+    - data_set: stackoverflow                     # Dataset: openImg, google_speech, blog(stackoverflow)
+    - task: nlp
+    - data_dir: $DATA_PATH        # Path of the dataset
+    - data_map_dir: $DATA_PATH/client_data_mapping #$DATA_PATH/openImg/client_data_mapping/train.csv
+    - device_conf_file: $HOME/fl/FedScale/dataset/data/device_info/client_device_capacity
+    - device_avail_file: $HOME/fl/FedScale/dataset/data/device_info/client_behave_trace
+    - sample_mode: random                                  # Client selection: random, oort
+    - model: albert-base-v2                            # Models: shufflenet_v2_x2_0, mobilenet_v2, resnet34, albert-base-v2
+    - round_penalty: 2.0                    # Penalty factor in our paper (\alpha), \alpha -> 0 turns to (Oort w/o sys)
+    - eval_interval: 20                     # How many rounds to run a testing on the testing set
+    - epochs: 1000                           # Number of rounds to run this training. We use 1000 in our paper, while it may converge w/ ~400 rounds
+    - test_bsz: 32
+    - test_ratio: 0.25
+    - learning_rate: 4e-5
+    - min_learning_rate: 2e-5
+    - pacer_delta: 0.3
+    - exploration_min: 0.4
+    - use_cuda: 1
+    - use_wandb: 1
+#    - deadline_percent: 0.0
+#    - upload_epoch: 5
+#    - use_wandb: 1
+#    - deadline: 250
+#    - overcommit: 1
+#    - target_ratio: 0.0
+#    - avail_priority: 1
+#    - random_behv: 1
+#    #- sample_seed: 345
+#    - sequential: 1
+#    - enforce_random: 1
+#    - total_clients: 1000
+#    - zipf_alpha: '1.95'
+#    - used_samples: 5
+#    - filter_class: 510
+#    #- last_worker: 1
+#    #- filter_more: 500
+#    - num_loaders: 1
