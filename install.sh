@@ -14,7 +14,7 @@
 conda init bash
 #. ~/.bashrc
 conda env create -f environment.yml # Install dependencies
-conda activate fedscale
+conda activate eafl
 
 
 # un-comment to install cuda

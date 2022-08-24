@@ -1,10 +1,10 @@
 
-## FedScale Automated Runtime: Evaluation Platform for Federated Learning
+## Automated Runtime: Evaluation Platform for Federated Learning
 
 Existing FL evaluation platforms can hardly reproduce the scale of practical FL deployments and often fall short in providing user-friendly APIs, 
-thus requiring great developer efforts to deploy new plugins. As such, we introduce FedScale Automated Runtime (FAR), 
-an automated and easily-deployable evaluation platform, to simplify and standardize the FL experimental setup and model evaluation under a practical setting. 
-FAR is based on our [Oort project](https://github.com/SymbioticLab/Oort), which has been shown to scale well and can emulate FL training of thousands of clients 
+thus requiring great developer efforts to deploy new plugins. As such, we introduce the automated runtime, 
+which is an automated and easily-deployable evaluation platform, to simplify and standardize the FL experimental setup and model evaluation under a practical setting. 
+The runtime is based on our [Oort project](https://github.com/SymbioticLab/Oort), which has been shown to scale well and can emulate FL training of thousands of clients 
 in each round.
 
 ## Preliminary
@@ -34,14 +34,14 @@ i.e., if the number of participants in each round is K, then we would better use
 
 - ***Master Node***: Make sure that the master node (parameter server) has access to other worker nodes via ```ssh```. 
 
-- ***All Nodes***: Follow [this](https://github.com/SymbioticLab/FedScale#getting-started) to install all necessary libs, and then download the datasets following [this](https://github.com/SymbioticLab/FedScale/blob/master/dataset/README.md).
+- ***All Nodes***: Follow [this](#getting-started) to install all necessary libs, and then download the datasets following [this](dataset/README.md).
 
 ### Setting Job Configuration
 
-We provide an example of submitting a training job in ```FedScale/core/evals/manager.py```, whereby the user can submit jobs on the master node. 
+We provide an example of submitting a training job in ```EAFL/core/evals/manager.py```, whereby the user can submit jobs on the master node. 
 
 - ```python manager.py submit [conf.yml]``` will submit a job with parameters specified in conf.yml on both the PS and worker nodes. 
-We provide some example ```conf.yml``` in ```FedScale/core/evals/configs``` for each dataset. 
+We provide some example ```conf.yml``` in ```EAFL/core/evals/configs``` for each dataset. 
 They are close to the settings used in our evaluations. Comments in our example will help you quickly understand how to specify these parameters. 
 
 - ```python manager.py stop [job_name]``` will terminate the running ```job_name``` (specified in yml) on the used nodes. 

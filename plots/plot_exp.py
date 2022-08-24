@@ -31,7 +31,7 @@ params = {'backend': 'pdf', #'ps',
             }
 plt.rcParams.update(params)
 
-main_dir='/homes/ahmed/amna/iFedScale/'
+main_dir='/homes/user/EAFL/'
 api = wandb.Api()
 proj_names = ['energy_eff']
 sample_methods = ['oort']  #can add more

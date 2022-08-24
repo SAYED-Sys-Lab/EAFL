@@ -1,5 +1,5 @@
 
-## FedScale: Benchmarking Model and System Performance of Federated Learning
+## EAFL: Energy-Aware Federated Learning on Battery-Powered Clients
 
 ## Getting Started
 
@@ -83,27 +83,30 @@ We use a large-scale real-world user behavior dataset from [FLASH](https://githu
 ## Notes
 please consider to cite our paper if you use the code or data in your research project.
 
+## Notes
+please consider to cite our paper if you use the code or data in your research project.
+
 ```bibtex
-@inproceedings{fedscale-arxiv,
-  title={FedScale: Benchmarking Model and System Performance of Federated Learning},
-  author={Fan Lai and Yinwei Dai and Xiangfeng Zhu and Mosharaf Chowdhury},
-  booktitle={arxiv},
+@inproceedings{eafl-arxiv,
+  title={EAFL: Towards Energy-Aware Federated Learning on Battery-Powered Edge Devices},
+  author={Amna Arouj and Ahmed M. Abdelmoniem},
+  booktitle={arXiv:2208.04505},
   year={2021}
 }
 ```
 
-or 
+and  
 
 ```bibtex
-@inproceedings{oort-osdi21,
-  title={Oort: Efficient Federated Learning via Guided Participant Selection},
-  author={Fan Lai and Xiangfeng Zhu and Harsha V. Madhyastha and Mosharaf Chowdhury},
-  booktitle={USENIX Symposium on Operating Systems Design and Implementation (OSDI)},
-  year={2021}
+@inproceedings{eafl-fededge22,
+  title={Towards Energy-Aware Federated Learning on Battery-Powered Clients},
+  author={Amna Arouj and Ahmed M. Abdelmoniem},
+  booktitle={ACM FedEdge workshop - MobiCom},
+  year={2022}
 }
 ```
 
 ## Contact
-Fan Lai (fanlai@umich.edu), Yinwei Dai (dywsjtu@umich.edu), Xiangfeng Zhu (xzhu0027@gmail.com) and Mosharaf Chowdhury from the University of Michigan.
+Amna Arouj (amna.arouj@gmail.com), Ahmed M. Abdelmoniem (ahmedcs982@gmail.com)
 
 

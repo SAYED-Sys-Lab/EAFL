@@ -1,16 +1,15 @@
 
-## FedScale: Benchmarking Model and System Performance of Federated Learning ([Paper](https://arxiv.org/abs/2105.11367))
+## EAFL: Energy-Aware Federated Learning Framework on Battery-Powered Clients ([Paper](https://arxiv.org/abs/2208.04505))
 
-This repository contains scripts and instructions of building FedScale, 
-a diverse set of challenging and realistic benchmark datasets to facilitate scalable, comprehensive, 
+This repository contains scripts and instructions of running EAFL, a framework for experimenting with federated learning battery-powered clients. 
+EAFL extends [FedScale](https://fedscale.ai) framework which provides a diverse set of challenging and realistic benchmark datasets to facilitate scalable, comprehensive, 
 and reproducible federated learning (FL) research. FedScale datasets are large-scale, encompassing a diverse range of important FL tasks, 
 such as image classification, object detection, language modeling, speech recognition, and reinforcement learning. 
 For each dataset, we provide a unified evaluation protocol using realistic data splits and evaluation metrics. 
-To meet the pressing need for reproducing realistic FL at scale, we have also built an efficient evaluation platform, 
-FedScale Automated Runtime (FAR), to simplify and standardize the process of FL experimental setup and model evaluation. 
+To meet the pressing need for reproducing realistic FL at scale. The framework leverages an efficient evaluation platform for automated runtime to simplify and standardize the process of FL experimental setup and model evaluation. 
 Our evaluation platform provides flexible APIs to implement new FL algorithms and include new execution backends with minimal developer efforts.  
 
-***FedScale is open-source with permissive licenses and actively maintained, 
+***EAFL is open-source with permissive licenses and actively maintained, 
 and we welcome feedback and contributions from the community!***
 
 ## Overview
@@ -31,11 +30,11 @@ Our ```install.sh``` will install the following automatically:
 
 Note: if you prefer different versions of conda and CUDA, please check  comments in `install.sh` for details.
 
-Run the following commands to install FedScale. 
+Run the following commands to install EAFL. 
 
 ```
-git clone https://github.com/SymbioticLab/FedScale
-cd FedScale
+git clone https://github.com/SAYED-Sys-Lab/EAFL
+cd EAFL
 source install.sh 
 ```
 
@@ -79,23 +78,22 @@ Misc Applications:
 
 ***Note that no details were kept of any of the participants age, gender, or location, and random ids were assigned to each individual. In using these datasets, we will strictly obey to their licenses, and these datasets provided in this repo should be used for research purpose only.***
 
-Please go to `./dataset` directory and follow the dataset [README](https://github.com/SymbioticLab/FedScale/blob/master/dataset/README.md) for more details.
+Please go to `./dataset` directory and follow the dataset [README](dataset/README.md) for more details.
 
-## Run Experiments with FAR
-FedScale Automated Runtime (FAR), an automated and easily-deployable evaluation platform, to simplify and standardize the FL experimental setup and model evaluation under a practical setting. FAR is based on our [Oort project](https://github.com/SymbioticLab/Oort), which has been shown to scale well and can emulate FL training of thousands of clients in each round.
+## Run Experiments
+EAFL is an automated and easily-deployable evaluation platform, to simplify and standardize the FL experimental setup and model evaluation under a practical setting.
 
+<img src="figures/faroverview.png" alt="Automated emulation enables the developer to benchmark various FL efforts with practical FL data and metrics">
 
-<img src="figures/faroverview.png" alt="FAR enables the developer to benchmark various FL efforts with practical FL data and metrics">
-
-Please go to `./core` directory and follow the FAR [README](https://github.com/SymbioticLab/FedScale/blob/master/core/README.md) to set up FL training scripts.
+Please go to `./core` directory and follow the core functions of the emulation platform [README](core/README.md) to set up FL training scripts.
 
 
 ## Repo Structure
 
 ```
 Repo Root
-|---- dataset     # Realistic datasets in FedScale
-|---- core        # Experiment platform of FedScale
+|---- dataset     # Realistic datasets in EAFL
+|---- core        # Experiment platform of EAFL
     |---- examples  # Examples of new plugins
     |---- evals     # Backend of job submission
     
@@ -105,10 +103,10 @@ Repo Root
 please consider to cite our paper if you use the code or data in your research project.
 
 ```bibtex
-@inproceedings{fedscale-arxiv,
-  title={FedScale: Benchmarking Model and System Performance of Federated Learning},
-  author={Fan Lai and Yinwei Dai and Xiangfeng Zhu and Mosharaf Chowdhury},
-  booktitle={arXiv:2105.11367},
+@inproceedings{eafl-arxiv,
+  title={EAFL: Towards Energy-Aware Federated Learning on Battery-Powered Edge Devices},
+  author={Amna Arouj and Ahmed M. Abdelmoniem},
+  booktitle={arXiv:2208.04505},
   year={2021}
 }
 ```
@@ -116,15 +114,15 @@ please consider to cite our paper if you use the code or data in your research p
 and  
 
 ```bibtex
-@inproceedings{oort-osdi21,
-  title={Oort: Efficient Federated Learning via Guided Participant Selection},
-  author={Fan Lai and Xiangfeng Zhu and Harsha V. Madhyastha and Mosharaf Chowdhury},
-  booktitle={USENIX Symposium on Operating Systems Design and Implementation (OSDI)},
-  year={2021}
+@inproceedings{eafl-fededge22,
+  title={Towards Energy-Aware Federated Learning on Battery-Powered Clients},
+  author={Amna Arouj and Ahmed M. Abdelmoniem},
+  booktitle={ACM FedEdge workshop - MobiCom},
+  year={2022}
 }
 ```
 
 ## Contact
-Fan Lai (fanlai@umich.edu), Yinwei Dai (dywsjtu@umich.edu), Xiangfeng Zhu (xzhu0027@gmail.com) and Mosharaf Chowdhury from the University of Michigan.
+Amna Arouj (amna.arouj@gmail.com), Ahmed M. Abdelmoniem (ahmedcs982@gmail.com)
 
 

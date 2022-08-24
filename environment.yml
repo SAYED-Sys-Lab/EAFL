@@ -1,4 +1,4 @@
-name: ifedscale
+name: eafl
 channels:
   - pytorch
   - conda-forge
