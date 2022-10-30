@@ -39,7 +39,21 @@ parser.add_argument('--resume_wandb', type=boolean_string, default=False) # enab
 
 
 # Arouj - new params
-parser.add_argument('--scal_val', type=float, default=0.75) # the parameter used for prioritizing the high-power clients
+parser.add_argument('--scal_val', type=float, default=1) # the parameter used for prioritizing the high-power clients
+parser.add_argument('--pow_high', type=float, default=6.33) # Average power consumption for high end clients
+parser.add_argument('--pow_mid', type=float, default=5.44) # Average power consumption for mid end clients
+parser.add_argument('--pow_low', type=float, default=2.98) # Average power consumption for low end clients
+parser.add_argument('--energy_incr', type=int, default=5) # Increment on energy
+parser.add_argument('--battery_high', type=float, default=5000) # Battery capacity for high end clients
+parser.add_argument('--battery_mid', type=float, default=4000) # Battery capacity  for mid end clients
+parser.add_argument('--battery_low', type=float, default=3000) # Battery capacity  for low end clients
+parser.add_argument('--usage_param', type=float, default=5) #10% per hour to account for any usage
+parser.add_argument('--high_L', type=int, default=10) # lower range for battery capacity for high end clients
+parser.add_argument('--high_H', type=int, default=50) # higher range for battery capacity for high end clients
+parser.add_argument('--mid_L', type=int, default=20) # lower range for battery capacity for mid end clients
+parser.add_argument('--mid_H', type=int, default=60) # higher range for battery capacity for mod end clients
+parser.add_argument('--low_L', type=int, default=30) # higher range for battery capacity for low end clients
+parser.add_argument('--low_H', type=int, default=90) # higher range for battery capacity for low end clients
 
 # The basic configuration of the cluster
 parser.add_argument('--ps_ip', type=str, default='127.0.0.1')

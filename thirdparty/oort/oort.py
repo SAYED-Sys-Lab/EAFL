@@ -210,7 +210,6 @@ class _training_selector(object):
 
             logging.debug("Training selector: utilLastPacerRounds {}, utilCurrentPacerRounds {} in round {}"
                 .format(utilLastPacerRounds, utilCurrentPacerRounds, self.training_round))
-        logging.info("here")
         logging.info("Training selector: Pacer {}: lastExploitationUtil {}, lastExplorationUtil {}, last_util_record {}".
                         format(self.training_round, lastExploitationUtil, lastExplorationUtil, self.last_util_record))
 
@@ -268,14 +267,15 @@ class _training_selector(object):
         self.blacklist = self.get_blacklist()
 
         self.pacer()
-        logging.info("after pacerrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
         # normalize the score of all arms: Avg + Confidence
         scores = {}
         numOfExploited = 0
         exploreLen = 0
 
         client_list = list(self.totalArms.keys())
+        #logging.info(client_list)
         orderedKeys = [x for x in client_list if int(x) in feasible_clients and int(x) not in self.blacklist]
+        #logging.info(orderedKeys)
 
         if self.round_threshold < 100.:
             sortedDuration = sorted([self.totalArms[key]['duration'] for key in client_list])
@@ -291,6 +291,7 @@ class _training_selector(object):
                 moving_reward.append(creward)
                 staleness.append(self.training_round - self.totalArms[clientId]['time_stamp'])
 
+
         max_reward, min_reward, range_reward, avg_reward, clip_value = self.get_norm(moving_reward, self.args.clip_bound)
         max_staleness, min_staleness, range_staleness, avg_staleness, _ = self.get_norm(staleness, thres=1)
 
@@ -299,7 +300,6 @@ class _training_selector(object):
             if self.totalArms[key]['count'] > 0:
                 creward = min(self.totalArms[key]['reward'], clip_value)
                 numOfExploited += 1
-
                 sc = (creward - min_reward)/float(range_reward) \
                     + math.sqrt(0.1*math.log(self.training_round)/self.totalArms[key]['time_stamp']) # temporal uncertainty
 
@@ -319,13 +319,14 @@ class _training_selector(object):
         self.exploration = max(self.exploration*self.decay_factor, self.exploration_min)
         explorationLen = int(numOfSamples*self.exploration)
 
+
         # exploitation
         #Ahmed - fix the logic should be length - 1, causes index out of range
         exploitLen = min(numOfSamples-explorationLen, len(clientLakes) - 1)
 
         # take the top-k, and then sample by probability, take 95% of the cut-off loss
         sortedClientUtil = sorted(scores, key=scores.get, reverse=True)
-        logging.info(f'Aggregator OORT - explorelen:{explorationLen} exploit:{exploitLen}  scores len: {len(scores)}:{len(sortedClientUtil)} sorted: {sortedClientUtil} arms: {self.totalArms} orderedkeys:{orderedKeys}')
+        #logging.info(f'Aggregator OORT - explorelen:{explorationLen} exploit:{exploitLen}  scores len: {len(scores)}:{len(sortedClientUtil)} sorted: {sortedClientUtil} arms: {self.totalArms} orderedkeys:{orderedKeys}')
 
         # take cut-off utility
         if len(scores):
@@ -346,13 +347,9 @@ class _training_selector(object):
         if len(tempPickedClients) > 0:
             totalSc = max(1e-4, float(sum([scores[key] for key in tempPickedClients])))
             p = [scores[key]/totalSc for key in tempPickedClients]
-            logging.info(p)
-            p = np.array(p)
-            p /= p.sum()
-            #logging.info(p)
         self.exploitClients = list(np2.random.choice(tempPickedClients, exploitLen, p=p, replace=False))
 
-        pickedClients = []  
+        pickedClients = []
 
         # exploration
         _unexplored = [x for x in list(self.unexplored) if int(x) in feasible_clients]
@@ -370,14 +367,14 @@ class _training_selector(object):
             pickedUnexploredClients = sorted(init_reward, key=init_reward.get, reverse=True)[:min(int(self.sample_window*exploreLen), len(init_reward))]
 
             unexploredSc = float(sum([init_reward[key] for key in pickedUnexploredClients]))
+            p = [init_reward[key] / max(1e-4, unexploredSc) for key in pickedUnexploredClients]
+            #p = np.array(p)
+            #p /= p.sum()
+            pickedUnexplored = list(np2.random.choice(pickedUnexploredClients, exploreLen, p=p, replace=False))
 
-            pickedUnexplored = list(np2.random.choice(pickedUnexploredClients, exploreLen,
-                            p=[init_reward[key]/max(1e-4, unexploredSc) for key in pickedUnexploredClients], replace=False))
             self.exploreClients = pickedUnexplored
 
         pickedClients = self.exploreClients + self.exploitClients
-        logging.info(pickedClients)
-        logging.info(numOfSamples)
         #Ahmed - handle the case when the picked clients are less than the target number to be sampled, randomly add clients
         num= len(pickedClients)
         while num < numOfSamples:
@@ -385,7 +382,7 @@ class _training_selector(object):
             if cid not in pickedClients:
                  pickedClients.append(cid)
             num=num+1
-        logging.info(pickedClients)
+
 
         top_k_score = []
         for i in range(min(3, len(pickedClients))):
@@ -397,15 +394,14 @@ class _training_selector(object):
         logging.info("At round {}, UCB exploited {}, augment_factor {}, exploreLen {}, un-explored {}, exploration {}, round_threshold {}, sampled score is {}"
             .format(self.training_round, numOfExploited, augment_factor/max(1e-4, exploitLen), exploreLen, len(self.unexplored), self.exploration, self.round_threshold, top_k_score))
         # logging.info("At time {}, all rewards are {}".format(cur_time, allloss))
-        logging.info("pickeddddddddddddddddddddddddddddd")
-        #print(pickedClients)
+
         return pickedClients
 
     def get_median_reward(self):
         feasible_rewards = [self.totalArms[x]['reward'] for x in list(self.totalArms.keys()) if int(x) not in self.blacklist]
 
         # we report mean instead of median
-        if len(feasible_rewards) > 0:   
+        if len(feasible_rewards) > 0:
             return sum(feasible_rewards)/float(len(feasible_rewards))
 
         return 0
@@ -419,7 +415,7 @@ class _training_selector(object):
     def get_norm(self, aList, clip_bound=0.95, thres=1e-4):
         aList.sort()
         clip_value = aList[min(int(len(aList)*clip_bound), len(aList)-1)]
-
+        #logging.info(clip_value)
         _max = aList[-1]
         _min = aList[0]*0.999
         _range = max(_max - _min, thres)

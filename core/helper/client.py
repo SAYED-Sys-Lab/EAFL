@@ -2,20 +2,22 @@ import random
 from random import randint
 class Client(object):
 
-    def __init__(self, hostId, clientId, speed, category,traces=None):
+    def __init__(self, hostId, clientId, speed, category, args, traces=None):
         self.hostId = hostId
         self.clientId = clientId
         #Ahmed - based on the format from the device trace file key:432802 val:{'computation': 162.0, 'communication': 5648.109619499134}
         self.compute_speed = speed['computation']
         self.bandwidth = speed['communication']
         self.category = category
+        self.args = args
+        self.traces = traces
         self.battery=0
-        self.utility=0
         self.batterystatus = 'alive'
         self.score = 0
-        self.traces = traces
         self.behavior_index = 0
         self.count=0
+        self.initialbattery=0
+
 
     def getScore(self):
         return self.score
@@ -29,7 +31,7 @@ class Client(object):
     def isAlive(self, roundduration):  # Checking left battery level for current round
 
         if(self.category=='H'):
-            timeleft = self.battery/6.43  #in hours
+            timeleft = self.battery/self.args.pow_high #in hours
             timeleft*=(60 * 60)  #time left in seconds
             if(timeleft<roundduration):
                 self.setbatterystatus('dead')
@@ -38,7 +40,7 @@ class Client(object):
                 return True
 
         if (self.category == 'M'):
-           timeleft = self.battery / 5.44  # inhours
+           timeleft = self.battery / self.args.pow_mid # inhours
            timeleft *= (60 * 60)  # time left in seconds
            if (timeleft < roundduration):
                self.setbatterystatus('dead')
@@ -47,7 +49,7 @@ class Client(object):
                return True
 
         if (self.category == 'L'):
-            timeleft = self.battery / 2.98  # inhours
+            timeleft = self.battery / self.args.pow_low  # inhours
             timeleft *= (60 * 60)  # time left in seconds
             if (timeleft < roundduration):
                    self.setbatterystatus('dead')
@@ -82,7 +84,7 @@ class Client(object):
     #Format - key:432802 val:{'computation': 162.0, 'communication': 5648.109619499134}
     def getCompletionTime(self, batch_size, upload_epoch, upload_size, download_size, augmentation_factor=3.0):
         """
-           Computation latency: compute_speed is the inference latency of models (ms/sample). As reproted in many papers, 
+           Computation latency: compute_speed is the inference latency of models (ms/sample). As reproted in many papers,
                                 backward-pass takes around 2x the latency, so we multiple it by 3x;
            Communication latency: communication latency = (pull + push)_update_size/bandwidth;
         """
@@ -100,11 +102,11 @@ class Client(object):
         # computational energy
         # GFXBench Manhattan 3.1 Offscreen Power Efficiency (System Active Power)
         if (self.category == 'H'):
-            Ecomp= 6.33 * (comp)
+            Ecomp= self.args.pow_high * (comp)
         if (self.category == 'M'):
-            Ecomp= 5.44 * (comp)
+            Ecomp= self.args.pow_mid * (comp)
         if (self.category == 'L'):
-            Ecomp= 2.98 * (comp)
+            Ecomp= self.args.pow_low * (comp)
 
         ''' COMMUNICATIONAL ENERGY'''
 
@@ -118,15 +120,15 @@ class Client(object):
             Ecomm = (19.66 * comm)+ 1.425           # Wi-Fi
 
         Energy = Ecomp + ((Ecomm/100) * (1230.0 * 5 / 1000))
-        Energy  *= 3
+        Energy  *= self.args.energy_incr
         return Energy
 
 
     def updateutility(self, energy):
 
-        self.utility = self.utility - energy
-        self.battery=self.utility
-        return self.utility
+        self.battery = self.battery - energy
+
+        return self.battery
 
     def getEnergyeff(self, energy, batch_size):
             efficiency = batch_size / energy    #performance per watt (samples processed per watt)
@@ -136,20 +138,20 @@ class Client(object):
 
         #battery in percentage
         if(category=='H'):
-            perc = random.randint(10, 50)
-            self.battery= 5000 * (perc/100)
+            perc = random.randint(self.args.high_L, self.args.high_H)
+            self.battery= self.args.battery_high * (perc/100)
 
         if (category == 'M'):
-            perc = random.randint(20, 60)
-            self.battery = 4000 * (perc/100)
+            perc = random.randint(self.args.mid_L, self.args.mid_H)
+            self.battery = self.args.battery_mid * (perc/100)
 
         if(category == 'L'):
-            perc = random.randint(30, 90)
-            self.battery = 3000 * (perc/100)
+           perc = random.randint(self.args.mid_L, self.args.low_H)
+           self.battery = self.args.battery_low * (perc/100)
 
         self.battery *= 5.0 / 1000.0 #convert from mAh to Wh
-        self.utility = self.battery
 
+        return self.battery
 
     def getbattery(self):
         return self.battery
@@ -167,9 +169,15 @@ class Client(object):
     def idlepowerdeduction(self,duration):
         duration /= (60 * 60)  # convert time from seconds to hours
         #10% per hour to account for any usage
-        perc = duration * 10
-        self.battery -=self.battery * perc/100
+        # https://arxiv.org/ftp/arxiv/papers/1312/1312.6740.pdf
+        # The Power of Smartphones
+        perc = duration * self.args.usage_param
+        self.battery -= self.battery * perc/100
         return self.battery
+
+    
+
+
 
 
 

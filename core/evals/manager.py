@@ -7,6 +7,7 @@ import random
 import os, subprocess
 import pickle, datetime
 
+
 # Change the HOME path
 # import os okay
 # os.environ['HOME'] = '/data/scratch/ahmed'
@@ -16,8 +17,8 @@ def load_yaml_conf(yaml_file):
         data = yaml.load(fin, Loader=yaml.FullLoader)
     return data
 
-def process_cmd(yaml_file, remote=False):
 
+def process_cmd(yaml_file, remote=False):
     yaml_conf = load_yaml_conf(yaml_file)
 
     ps_ip = yaml_conf['ps_ip']
@@ -35,10 +36,10 @@ def process_cmd(yaml_file, remote=False):
     log_path = './logs'
     submit_user = f"{yaml_conf['auth']['ssh_user']}@" if len(yaml_conf['auth']['ssh_user']) else ""
 
-    job_conf = {'time_stamp':time_stamp,
-                'ps_ip':ps_ip,
-                'ps_port':random.randint(1000, 60000),
-                'manager_port':random.randint(1000, 60000)
+    job_conf = {'time_stamp': time_stamp,
+                'ps_ip': ps_ip,
+                'ps_port': random.randint(1000, 60000),
+                'manager_port': random.randint(1000, 60000)
                 }
 
     for conf in yaml_conf['job_conf']:
@@ -61,15 +62,13 @@ def process_cmd(yaml_file, remote=False):
             log_path = os.path.join(job_conf[conf_name], 'log', job_name, time_stamp)
 
     total_gpu_processes = sum([x for x in total_gpus])
-    learner_conf = '-'.join([str(_) for _ in list(range(1, total_gpu_processes+1))])
+    learner_conf = '-'.join([str(_) for _ in list(range(1, total_gpu_processes + 1))])
     # =========== Submit job to parameter server ============
     running_vms.add(ps_ip)
     ps_cmd = f" python {yaml_conf['exp_path']}/{yaml_conf['aggregator_entry']} {conf_script} --this_rank=0 --learner={learner_conf} --use_cuda=0"
 
     with open(f"{job_name}_logging", 'wb') as fout:
         pass
-   
-
 
     print(f"Starting aggregator on {ps_ip}...")
     if remote:
@@ -104,13 +103,13 @@ def process_cmd(yaml_file, remote=False):
     current_path = os.path.dirname(os.path.abspath(__file__))
     job_name = os.path.join(current_path, job_name)
     with open(job_name, 'wb') as fout:
-        job_meta = {'user':submit_user, 'vms': running_vms}
+        job_meta = {'user': submit_user, 'vms': running_vms}
         pickle.dump(job_meta, fout)
 
     print(f"Submitted job, please check your logs ({log_path}) for status")
 
-def terminate(job_name):
 
+def terminate(job_name):
     current_path = os.path.dirname(os.path.abspath(__file__))
     job_meta_path = os.path.join(current_path, job_name)
 
@@ -125,9 +124,10 @@ def terminate(job_name):
         print(f"Shutting down job on {vm_ip}")
         with open(f"{job_name}_logging", 'a') as fout:
             subprocess.Popen(f'ssh {job_meta["user"]}{vm_ip} "python {current_path}/shutdown.py {job_name}"',
-                            shell=True, stdout=fout, stderr=fout)
+                             shell=True, stdout=fout, stderr=fout)
 
         # _ = os.system(f"ssh {job_meta['user']}{vm_ip} 'python {current_path}/shutdown.py {job_name}'")
+
 
 if sys.argv[1] == 'submit':
     process_cmd(sys.argv[2], remote=True)

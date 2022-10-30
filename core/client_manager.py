@@ -15,7 +15,7 @@ class clientManager(object):
         self.filter_less = args.filter_less
         self.filter_more = args.filter_more
 
-        self.ucbSampler = None 
+        self.ucbSampler = None
 
         if self.mode == 'oort':
             from oort import create_training_selector
@@ -34,6 +34,7 @@ class clientManager(object):
         # Ahmed - introduce a per client counter of avail periods equal to the length of deadline
         self.avail_counter = {}
         self.low_avail = 0
+
 
             #Ahmed - set values for the random assignment from low avail clients
         #if self.args.random_behv == 2:
@@ -117,24 +118,32 @@ class clientManager(object):
         else:
             user_trace = None
 
-        self.Clients[uniqueId] = Client(hostId, clientId, speed, category, user_trace)
+        self.Clients[uniqueId] = Client(hostId, clientId, speed, category, self.args, user_trace )
+
+
+
 
         # remove clients
         if size >= self.filter_less and size <= self.filter_more:
             self.feasibleClients.append(clientId)
             self.feasible_samples += size
 
+            battery= self.setbatterylevel(clientId, category=category) #only for eafl , for oort we will send reward
+
             if self.mode == 'oort':
                 time = self.getCompletionTime(clientId, self.args.batch_size, self.args.local_steps, 0, 0)
                 reward = min(size, self.args.local_steps * self.args.batch_size)
-                feedbacks = {'reward':reward,
+                if(self.args.scal_val==0 or self.args.scal_val==0.25):
+                    reward=1
+                #logging.info(reward)
+                feedbacks = {'reward': reward,
                             'duration': duration,
                             }
                 self.ucbSampler.register_client(clientId, feedbacks=feedbacks)
 
     def setbatterylevel(self, clientId, category):
 
-            self.Clients[self.getUniqueId(0, clientId)].setbatterylevel(category=category)
+           return self.Clients[self.getUniqueId(0, clientId)].setbatterylevel(category=category)
 
     def getbattery(self, clientId):
 
@@ -182,6 +191,7 @@ class clientManager(object):
 
     def registerScore(self, clientId, reward, auxi=1.0, time_stamp=0, duration=1., success=True):
         # currently, we only use distance as reward
+
 
         if self.mode == 'oort':
             feedbacks = {
@@ -256,9 +266,9 @@ class clientManager(object):
 
             return 1./totalSampleInTraining
 
-    def getFeasibleClients(self, cur_time):
+    def getFeasibleClients(self, dropoutclients): #removed cur_time
 
-        clients_alive = [clientId for clientId in self.feasibleClients if self.Clients[self.getUniqueId(0, clientId)].getbatterystatus()]
+        clients_alive = [clientId for clientId in self.feasibleClients if clientId not in dropoutclients]
 
         return clients_alive
         #logging.info(f"Wall clock time: {round(cur_time)}, {len(clients_alive)} clients alive, " + \
@@ -282,13 +292,12 @@ class clientManager(object):
     #             offline_clients[clientId] = bindex
     #     return online_clients, offline_clients
 
-    def resampleClients(self, numOfClients, cur_time=0, time_window=0):
+    def resampleClients(self, numOfClients, dropouts, cur_time=0, time_window=0):
 
         self.count += 1
 
-        clients_alive = self.getFeasibleClients(cur_time)
-        self.cur_alive_clients = clients_alive
-
+        clients_alive = self.getFeasibleClients(dropouts)
+        #self.cur_alive_clients = clients_alive
         if len(clients_alive) <= numOfClients:
             return clients_alive
 
@@ -412,11 +421,17 @@ class clientManager(object):
     def setbatterystatus(self, clientId, status):
         self.Clients[self.getUniqueId(0, clientId)].setbatterystatus(status=status)
 
-    def idlepowerdeduction(self, clients, duration):
+    def idlepowerdeduction(self, clients, dropouts, duration):
+        results=[]
+        clientsrem=[]
         for clientId in self.feasibleClients:
-            if clientId not in clients and self.Clients[self.getUniqueId(0, clientId)].getbatterystatus():
-                battery=self.Clients[self.getUniqueId(0, clientId )].idlepowerdeduction(duration=duration)
+            if clientId not in clients:
+                if clientId not in dropouts:
+                    clientsrem.append(clientId)
+                    results.append(self.Clients[self.getUniqueId(0, clientId )].idlepowerdeduction(duration=duration))
+        return results, clientsrem
 
+   
 
 
 
