@@ -1,9 +1,8 @@
 
-## EAFL: Energy-Aware Federated Learning Framework on Battery-Powered Clients ([Paper](https://arxiv.org/abs/2208.04505))
+## EAFL+: Towards Energy-Aware Federated Learning via Collaborative Computing Approach <!--([Paper](https://arxiv.org/abs/2208.04505))-->
 
-This repository contains scripts and instructions of running EAFL, a framework for experimenting with federated learning battery-powered clients. 
-EAFL extends [FedScale](https://fedscale.ai) framework which provides a diverse set of challenging and realistic benchmark datasets to facilitate scalable, comprehensive, 
-and reproducible federated learning (FL) research. FedScale datasets are large-scale, encompassing a diverse range of important FL tasks, 
+This repository contains scripts and instructions for running EAFL+, a framework for experimenting with federated learning battery-powered clients. 
+EAFL extends [FedScale](https://fedscale.ai) framework which provides a diverse set of challenging and realistic benchmark datasets to facilitate scalable, comprehensive, and reproducible federated learning (FL) research. FedScale datasets are large-scale, encompassing a diverse range of important FL tasks, 
 such as image classification, object detection, language modeling, speech recognition, and reinforcement learning. 
 For each dataset, we provide a unified evaluation protocol using realistic data splits and evaluation metrics. 
 To meet the pressing need for reproducing realistic FL at scale. The framework leverages an efficient evaluation platform for automated runtime to simplify and standardize the process of FL experimental setup and model evaluation. 
